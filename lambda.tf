@@ -7,7 +7,7 @@ resource "aws_lambda_function" "judgment_packer" {
 
   environment {
     variables = {
-      "TRE_S3_JUDGMENT_OUT_BUCKET" = aws_s3_bucket.packed-judgment-out.bucket
+      "TRE_S3_JUDGMENT_OUT_BUCKET" = aws_s3_bucket.packed_judgment_out.bucket
       "TRE_ENVIRONMENT"            = var.env
       "TRE_PRESIGNED_URL_EXPIRY"   = 360
       "TRE_PROCESS_NAME"           = local.step_function_name
