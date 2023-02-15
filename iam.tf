@@ -142,6 +142,6 @@ data "aws_iam_policy_document" "judgment_packer_out_bucket" {
       identifiers = [aws_iam_role.judgment_packer_sf_lambda_role.arn]
     }
 
-    resources = ["${aws_s3_bucket.packed-judgment-out.arn}/*", aws_s3_bucket.packed-judgment-out.arn]
+    resources = ["${aws_s3_bucket.packed_judgment_out.arn}/*", aws_s3_bucket.packed_judgment_out.arn]
   }
 }
