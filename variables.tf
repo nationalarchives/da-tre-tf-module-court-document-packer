@@ -19,7 +19,7 @@ variable "common_tre_slack_alerts_topic_arn" {
   type        = string
 }
 
-variable "judgment_packer_version" {
+variable "judgment_packer_sf_version" {
   description = "judgment packer version (update if Step Function flow or called Lambda function versions change)"
   type        = string
 
