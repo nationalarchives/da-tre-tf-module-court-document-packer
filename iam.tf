@@ -73,18 +73,18 @@ resource "aws_iam_role_policy_attachment" "judgment_packer_lambda_logs" {
 }
 
 # Role for the judgment packer step-function trigger
-resource "aws_iam_role" "judgment_packer_trigger_role" {
-  name                 = "${var.env}-${var.prefix}-judgment-packer-trigger-lambda-role"
+resource "aws_iam_role" "judgment_packer_sf_trigger_role" {
+  name                 = "${var.env}-${var.prefix}-judgment-packer-sf-trigger-lambda-role"
   assume_role_policy   = data.aws_iam_policy_document.lambda_assume_role_policy.json
   permissions_boundary = var.tre_permission_boundary_arn
   inline_policy {
-    name   = "${var.env}-${var.prefix}-judgment-packer-trigger"
-    policy = data.aws_iam_policy_document.judgment_packer_trigger.json
+    name   = "${var.env}-${var.prefix}-judgment-packer-sf-trigger"
+    policy = data.aws_iam_policy_document.judgment_packer_sf_trigger.json
   }
 }
 
 resource "aws_iam_role_policy_attachment" "judgment_packer_sqs_lambda_trigger" {
-  role       = aws_iam_role.judgment_packer_trigger_role.name
+  role       = aws_iam_role.judgment_packer_sf_trigger_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
@@ -101,7 +101,7 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
   }
 }
 
-data "aws_iam_policy_document" "judgment_packer_trigger" {
+data "aws_iam_policy_document" "judgment_packer_sf_trigger" {
   statement {
     actions   = ["states:StartExecution"]
     effect    = "Allow"

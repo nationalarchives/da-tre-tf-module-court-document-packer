@@ -17,11 +17,11 @@ resource "aws_lambda_function" "judgment_packer" {
 }
 
 # judgment_packer_step_function_trigger
-resource "aws_lambda_function" "judgment_packer_trigger" {
-  image_uri     = "${var.ecr_uri_host}/${var.ecr_uri_repo_prefix}${var.prefix}-judgment-packer-sf-trigger:${var.judgment_packer_image_versions.tre_sqs_sf_trigger}"
+resource "aws_lambda_function" "judgment_packer_sf_trigger" {
+  image_uri     = "${var.ecr_uri_host}/${var.ecr_uri_repo_prefix}${var.prefix}-judgment-packer-sf-trigger:${var.judgment_packer_image_versions.tre_sqs_judgment_packer_sf_trigger}"
   package_type  = "Image"
-  function_name = local.lambda_name_judgment_packer_trigger
-  role          = aws_iam_role.judgment_packer_trigger_role.arn
+  function_name = local.lambda_name_judgment_packer_sf_trigger
+  role          = aws_iam_role.judgment_packer_sf_trigger_role.arn
   timeout       = 30
 
   environment {
@@ -35,7 +35,7 @@ resource "aws_lambda_function" "judgment_packer_trigger" {
 
 resource "aws_lambda_event_source_mapping" "judgment_packer_in_sqs" {
   batch_size                         = 1
-  function_name                      = aws_lambda_function.judgment_packer_trigger.function_name
+  function_name                      = aws_lambda_function.judgment_packer_sf_trigger.function_name
   event_source_arn                   = aws_sqs_queue.judgment_packer_in_sqs.arn
   maximum_batching_window_in_seconds = 0
 }
