@@ -29,7 +29,7 @@ variable "judgment_packer_image_versions" {
   description = "Latest version of Images for Lambda Functions"
   type = object({
     tre_judgment_packer = string
-    tre_sqs_judgment_packer_sf_trigger  = string
+    tre_sqs_sf_trigger  = string
   })
 }
 
