@@ -18,7 +18,7 @@ resource "aws_lambda_function" "judgment_packer" {
 
 # judgment_packer_step_function_trigger
 resource "aws_lambda_function" "judgment_packer_sf_trigger" {
-  image_uri     = "${var.ecr_uri_host}/${var.ecr_uri_repo_prefix}${var.prefix}-judgment-packer-sf-trigger:${var.judgment_packer_image_versions.tre_sqs_judgment_packer_sf_trigger}"
+  image_uri     = "${var.ecr_uri_host}/${var.ecr_uri_repo_prefix}${var.prefix}-sqs-sf-trigger:${var.judgment_packer_image_versions.tre_sqs_sf_trigger}"
   package_type  = "Image"
   function_name = local.lambda_name_judgment_packer_sf_trigger
   role          = aws_iam_role.judgment_packer_sf_trigger_role.arn
