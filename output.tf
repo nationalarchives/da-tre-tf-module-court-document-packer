@@ -8,8 +8,8 @@ output "judgment_packer_lambda_role" {
   description = "ARN of the judgment packer Lamda Role"
 }
 
-output "dri_preingest_sip_generation_role_arn" {
+output "judgment_packer_role_arn" {
   value       = aws_sfn_state_machine.judgment_packer_sf.role_arn
-  description = "ARN of the DRI Preingest SIP Generation Step Function Role"
+  description = "ARN of the Judgment Packer Step Function Role"
 
 }

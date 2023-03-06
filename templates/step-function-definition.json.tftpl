@@ -1,71 +1,163 @@
 {
-  "Comment": "A Hello World example demonstrating various state types of the Amazon States Language",
-  "StartAt": "Pass",
+  "Comment": "A description of my state machine",
+  "StartAt": "Judgment Packer",
   "States": {
-    "Pass": {
-      "Comment": "A Pass state passes its input to its output, without performing work. Pass states are useful when constructing and debugging state machines.",
-      "Type": "Pass",
-      "Next": "Hello World example?"
-    },
-    "Hello World example?": {
-      "Comment": "A Choice state adds branching logic to a state machine. Choice rules can implement 16 different comparison operators, and can be combined using And, Or, and Not",
-      "Type": "Choice",
-      "Choices": [
+    "Judgment Packer": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${arn_lambda_judgment_packer}"
+      },
+      "Retry": [
         {
-          "Variable": "$.IsHelloWorldExample",
-          "BooleanEquals": true,
-          "Next": "Yes"
-        },
-        {
-          "Variable": "$.IsHelloWorldExample",
-          "BooleanEquals": false,
-          "Next": "No"
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
         }
       ],
-      "Default": "Yes"
-    },
-    "Yes": {
-      "Type": "Pass",
-      "Next": "Wait 3 sec"
-    },
-    "No": {
-      "Type": "Fail",
-      "Cause": "Not Hello World"
-    },
-    "Wait 3 sec": {
-      "Comment": "A Wait state delays the state machine from continuing for a specified time.",
-      "Type": "Wait",
-      "Seconds": 3,
-      "Next": "Parallel State"
-    },
-    "Parallel State": {
-      "Comment": "A Parallel state can be used to create parallel branches of execution in your state machine.",
-      "Type": "Parallel",
-      "Next": "Hello World",
-      "Branches": [
+      "Next": "Judgment Packer Output Handler",
+      "Catch": [
         {
-          "StartAt": "Hello",
-          "States": {
-            "Hello": {
-              "Type": "Pass",
-              "End": true
-            }
-          }
-        },
-        {
-          "StartAt": "World",
-          "States": {
-            "World": {
-              "Type": "Pass",
-              "End": true
-            }
-          }
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "Judgment Packer Lambda Error -> Slack"
         }
       ]
     },
-    "Hello World": {
-      "Type": "Pass",
-      "End": true
+    "Judgment Packer Output Handler": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Or": [
+            {
+              "Variable": "$.producer.event-name",
+              "StringEquals": "judgment-packer-available"
+            },
+            {
+              "Variable": "$.producer.event-name",
+              "StringEquals": "judgment-packer-error"
+            }
+          ],
+          "Next": "SNS Publish tre-internal"
+        }
+      ],
+      "Default": "Judgment Packer Unhandled Event -> Slack"
+    },
+    "SNS Publish tre-internal": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "MessageAttributes": {
+          "environment": {
+            "DataType": "String",
+            "StringValue.$": "$.producer.environment"
+          },
+          "name": {
+            "DataType": "String",
+            "StringValue.$": "$.producer.name"
+          },
+          "process": {
+            "DataType": "String",
+            "StringValue.$": "$.producer.process"
+          },
+          "type": {
+            "DataType": "String",
+            "StringValue.$": "$.producer.type"
+          },
+          "event-name": {
+            "DataType": "String",
+            "StringValue.$": "$.producer.event-name"
+          }
+        },
+        "Message.$": "$",
+        "TopicArn": "${arn_sns_topic_packed_judgment_out}"
+      },
+      "Next": "Choice",
+      "ResultPath": null
+    },
+    "Choice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Or": [
+            {
+              "Variable": "$.producer.event-name",
+              "StringEquals": "judgment-packer-sip-error"
+            },
+            {
+              "Variable": "$.producer.event-name",
+              "StringEquals": "judgment-packer-sip-available"
+            }
+          ],
+          "Next": "Success"
+        }
+      ],
+      "Default": "Unhandled Event -> Slack"
+    },
+    "Success": {
+      "Type": "Succeed"
+    },
+    "Judgment Packer Unhandled Event -> Slack": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "Message": {
+          "Execution.$": "$$.Execution.Name",
+          "StateMachine.$": "$$.StateMachine.Name",
+          "Status": "error",
+          "ErrorMessage.$": "$.producer.event-name",
+          "Event": "Invalid event name"
+        },
+        "TopicArn": "${arn_sns_topic_tre_slack_alerts}"
+      },
+      "Next": "Judgment Packer Unhandled Event"
+    },
+    "Judgment Packer Unhandled Event": {
+      "Type": "Fail"
+    },
+    "Judgment Packer Lambda Error -> Slack": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "${arn_sns_topic_tre_slack_alerts}",
+        "Message": {
+          "Execution.$": "$$.Execution.Name",
+          "StateMachine.$": "$$.StateMachine.Name",
+          "Status": "error",
+          "ErrorMessage.$": "$.Cause",
+          "Event": "Lambda Error (Judgment Packer)"
+        }
+      },
+      "Next": "Judgment Packer Failed"
+    },
+    "Judgment Packer Failed": {
+      "Type": "Fail"
+    },
+    "Unhandled Event -> Slack": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "Message": {
+          "Execution.$": "$$.Execution.Name",
+          "StateMachine.$": "$$.StateMachine.Name",
+          "Status": "error",
+          "ErrorMessage.$": "$.producer.event-name",
+          "Event": "Invalid event name"
+        },
+        "TopicArn": "${arn_sns_topic_tre_slack_alerts}"
+      },
+      "Next": "Unhandled Event"
+    },
+    "Unhandled Event": {
+      "Type": "Fail"
     }
   }
 }
