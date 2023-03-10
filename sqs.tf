@@ -1,5 +1,5 @@
 resource "aws_sqs_queue" "judgment_packer_in_sqs" {
-  name = "${var.env}-${var.prefix}-judgment_packer_in"
+  name = "${var.env}-${var.prefix}-judgment-packer-in"
   redrive_policy = jsonencode({
     deadLetterTargetArn = "${aws_sqs_queue.tre_judgment_packer_in_deadletter.arn}"
     maxReceiveCount     = 5

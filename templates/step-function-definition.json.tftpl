@@ -36,21 +36,14 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Or": [
-            {
-              "Variable": "$.producer.event-name",
-              "StringEquals": "judgment-packer-available"
-            },
-            {
-              "Variable": "$.producer.event-name",
-              "StringEquals": "judgment-packer-error"
-            }
-          ],
+          "Variable": "$.producer.event-name",
+          "StringEquals": "judgment-packer-available",
           "Next": "SNS Publish tre-internal"
         }
       ],
       "Default": "Judgment Packer Unhandled Event -> Slack"
     },
+
     "SNS Publish tre-internal": {
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
@@ -87,16 +80,8 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Or": [
-            {
-              "Variable": "$.producer.event-name",
-              "StringEquals": "judgment-packer-sip-error"
-            },
-            {
-              "Variable": "$.producer.event-name",
-              "StringEquals": "judgment-packer-sip-available"
-            }
-          ],
+          "Variable": "$.producer.event-name",
+          "StringEquals": "judgment-packer-available",
           "Next": "Success"
         }
       ],
