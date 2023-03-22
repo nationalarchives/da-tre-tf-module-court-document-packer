@@ -10,7 +10,8 @@ resource "aws_lambda_function" "judgment_packer" {
       "TRE_S3_JUDGMENT_OUT_BUCKET" = aws_s3_bucket.packed_judgment_out.bucket
       "TRE_ENVIRONMENT"            = var.env
       "TRE_PRESIGNED_URL_EXPIRY"   = 360
-      "TRE_PROCESS_NAME"           = local.step_function_name
+      "TRE_PARENT_STEP_FUNCTION"   = local.step_function_name
+      "TRE_PROCESS_NAME"           = local.lambda_name_judgment_packer
       "TRE_SYSTEM_NAME"            = upper(var.prefix)
     }
   }
