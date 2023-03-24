@@ -4,7 +4,7 @@ output "judgment_packer_in_queue_arn" {
 }
 
 output "judgment_packer_lambda_role" {
-  value       = aws_iam_role.judgement_packer.arn
+  value       = aws_iam_role.judgment_packer_sf_lambda_role.arn
   description = "ARN of the judgment packer Lamda Role"
 }
 
