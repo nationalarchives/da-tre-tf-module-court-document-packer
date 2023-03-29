@@ -55,29 +55,23 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
-        "MessageAttributes": {
-          "environment": {
-            "DataType": "String",
-            "StringValue.$": "$.producer.environment"
-          },
-          "name": {
-            "DataType": "String",
-            "StringValue.$": "$.producer.name"
-          },
-          "process": {
-            "DataType": "String",
-            "StringValue.$": "$.producer.process"
-          },
-          "type": {
-            "DataType": "String",
-            "StringValue.$": "$.producer.type"
-          },
-          "event-name": {
-            "DataType": "String",
-            "StringValue.$": "$.producer.event-name"
-          }
+        "Message": {
+            "properties": {
+                "messageType": "$.properties.messageType",
+                "timestampMillis":"$.properties.timestampMillis",
+                "function":"$.properties.function",
+                "producer":"$.properties.producer",
+                "executionId":"$.properties.executionId",
+                "parentExecutionId":"$.properties.parentExecutionId"
+            },
+            "parameters": {
+                "reference": "$.parameters.reference",
+                "originator": "$.parameters.originator",
+                "bundleFileURI": "$.parameters.bundleFileURI",
+                "metadataFilePath": "$.parameters.metadataFilePath",
+                "metadataFileType": "$.parameters.metadataFileType"
+            }
         },
-        "Message.$": "$",
         "TopicArn": "${arn_sns_topic_packed_judgment_out}"
       },
       "Next": "Choice",
@@ -113,7 +107,7 @@
           "Execution.$": "$$.Execution.Name",
           "StateMachine.$": "$$.StateMachine.Name",
           "Status": "error",
-          "ErrorMessage.$": "$.producer.event-name",
+          "ErrorMessage.$": "$.properties.messageType",
           "Event": "Invalid event name"
         },
         "TopicArn": "${arn_sns_topic_tre_slack_alerts}"
@@ -149,7 +143,7 @@
           "Execution.$": "$$.Execution.Name",
           "StateMachine.$": "$$.StateMachine.Name",
           "Status": "error",
-          "ErrorMessage.$": "$.producer.event-name",
+          "ErrorMessage.$": "$.properties.messageType",
           "Event": "Invalid event name"
         },
         "TopicArn": "${arn_sns_topic_tre_slack_alerts}"
