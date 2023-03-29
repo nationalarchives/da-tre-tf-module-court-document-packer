@@ -55,23 +55,7 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
-        "Message": {
-            "properties": {
-                "messageType": "$.properties.messageType",
-                "timestampMillis":"$.properties.timestampMillis",
-                "function":"$.properties.function",
-                "producer":"$.properties.producer",
-                "executionId":"$.properties.executionId",
-                "parentExecutionId":"$.properties.parentExecutionId"
-            },
-            "parameters": {
-                "reference": "$.parameters.reference",
-                "originator": "$.parameters.originator",
-                "bundleFileURI": "$.parameters.bundleFileURI",
-                "metadataFilePath": "$.parameters.metadataFilePath",
-                "metadataFileType": "$.parameters.metadataFileType"
-            }
-        },
+        "Message": "$",
         "TopicArn": "${arn_sns_topic_packed_judgment_out}"
       },
       "Next": "Choice",
