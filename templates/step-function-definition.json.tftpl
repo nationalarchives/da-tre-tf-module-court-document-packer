@@ -36,8 +36,16 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.producer.event-name",
-          "StringEquals": "judgment-packer-available",
+          "Or": [
+            {
+              "Variable": "$.properties.messageType",
+              "StringEquals": "uk.gov.nationalarchives.tre.messages.judgmentpackage.available.JudgmentPackageAvailable"
+            },
+            {
+              "Variable": "$.properties.messageType",
+              "StringEquals": "uk.gov.nationalarchives.tre.messages.Error"
+            }
+          ],
           "Next": "SNS Publish tre-internal"
         }
       ],
@@ -79,8 +87,16 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.producer.event-name",
-          "StringEquals": "judgment-packer-available",
+          "Or": [
+            {
+              "Variable": "$.properties.messageType",
+              "StringEquals": "uk.gov.nationalarchives.tre.messages.judgmentpackage.available.JudgmentPackageAvailable"
+            },
+            {
+              "Variable": "$.properties.messageType",
+              "StringEquals": "uk.gov.nationalarchives.tre.messages.Error"
+            }
+          ],
           "Next": "Success"
         }
       ],
