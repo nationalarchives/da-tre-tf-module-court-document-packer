@@ -107,7 +107,7 @@
           "Execution.$": "$$.Execution.Name",
           "StateMachine.$": "$$.StateMachine.Name",
           "Status": "error",
-          "ErrorMessage.$": "$.properties.messageType",
+          "ErrorMessage.$": "$.parameters.errors",
           "Event": "Invalid event name"
         },
         "TopicArn": "${arn_sns_topic_tre_slack_alerts}"
@@ -143,7 +143,7 @@
           "Execution.$": "$$.Execution.Name",
           "StateMachine.$": "$$.StateMachine.Name",
           "Status": "error",
-          "ErrorMessage.$": "$.properties.messageType",
+          "ErrorMessage.$": "$.parameters.errors",
           "Event": "Invalid event name"
         },
         "TopicArn": "${arn_sns_topic_tre_slack_alerts}"
