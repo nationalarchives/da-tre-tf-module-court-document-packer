@@ -55,7 +55,7 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
-        "Message": "$",
+        "Message.$": "$",
         "TopicArn": "${arn_sns_topic_packed_judgment_out}"
       },
       "Next": "Choice",
