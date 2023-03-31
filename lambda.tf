@@ -28,7 +28,7 @@ resource "aws_lambda_function" "judgment_packer_sf_trigger" {
   environment {
     variables = {
       "TRE_STATE_MACHINE_ARN"    = aws_sfn_state_machine.judgment_packer_sf.arn
-      "TRE_CONSIGNMENT_KEY_PATH" = "parameters.judgment_packer.reference"
+      "TRE_CONSIGNMENT_KEY_PATH" = "parameters.reference"
       "TRE_RETRY_KEY_PATH"       = "parameters.judgment_packer.number-of-retries"
     }
   }
