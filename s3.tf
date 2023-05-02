@@ -7,11 +7,6 @@ resource "aws_s3_bucket_policy" "packed_judgment_out" {
   policy = data.aws_iam_policy_document.judgment_packer_out_bucket.json
 }
 
-resource "aws_s3_bucket_acl" "packed_judgment_out" {
-  bucket = aws_s3_bucket.packed_judgment_out.id
-  acl    = "private"
-}
-
 resource "aws_s3_bucket_server_side_encryption_configuration" "packed_judgment_out" {
   bucket = aws_s3_bucket.packed_judgment_out.id
   rule {
