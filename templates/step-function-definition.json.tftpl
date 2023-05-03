@@ -5,7 +5,6 @@
     "Judgment Packer": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
-      "OutputPath": "$.Payload",
       "Parameters": {
         "Payload.$": "$",
         "FunctionName": "${arn_lambda_judgment_packer}"
@@ -22,15 +21,37 @@
           "BackoffRate": 2
         }
       ],
-      "Next": "Judgment Packer Output Handler",
       "Catch": [
         {
           "ErrorEquals": [
-            "States.TaskFailed"
+            "States.ALL"
           ],
-          "Next": "Judgment Packer Lambda Error -> Slack"
+          "Next": "Error -> tre-internal",
+          "ResultPath": "$.lambda-output.payload.parameters.errors"
         }
-      ]
+      ],
+      "ResultSelector": {
+        "payload.$": "$.Payload"
+      },
+      "ResultPath": "$.lambda-output",
+      "Next": "Judgment Packer Output Handler"
+    },
+    "Unhandled Error Prep": {
+      "Type": "Pass",
+      "Parameters": {
+        "lambda-output": {
+          "payload": {
+            "parameters": {
+              "errors.$": "$.lambda-output.payload"
+            }
+          }
+        },
+        "parameters.$": "$.parameters",
+        "properties.$": "$.properties"
+      },
+      "ResultPath": "$.temp",
+      "OutputPath": "$.temp",
+      "Next": "Error -> tre-internal"
     },
     "Judgment Packer Output Handler": {
       "Type": "Choice",
@@ -38,70 +59,90 @@
         {
           "Or": [
             {
-              "Variable": "$.properties.messageType",
-              "StringEquals": "uk.gov.nationalarchives.tre.messages.judgmentpackage.available.JudgmentPackageAvailable"
-            },
-            {
-              "Variable": "$.properties.messageType",
-              "StringEquals": "uk.gov.nationalarchives.tre.messages.Error"
+              "Variable": "$.lambda-output.payload.properties.messageType",
+              "IsPresent": false
             }
           ],
-          "Next": "SNS Publish tre-internal"
-        }
-      ],
-      "Default": "Judgment Packer Unhandled Event -> Slack"
-    },
-    "SNS Publish tre-internal": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::sns:publish",
-      "Parameters": {
-        "Message.$": "$",
-        "TopicArn": "${arn_sns_topic_packed_judgment_out}"
-      },
-      "Next": "Choice",
-      "ResultPath": null
-    },
-    "Choice": {
-      "Type": "Choice",
-      "Choices": [
+          "Next": "Unhandled Error Prep"
+        },
         {
           "Or": [
             {
-              "Variable": "$.properties.messageType",
+              "Variable": "$.lambda-output.payload.properties.messageType",
               "StringEquals": "uk.gov.nationalarchives.tre.messages.judgmentpackage.available.JudgmentPackageAvailable"
-            },
-            {
-              "Variable": "$.properties.messageType",
-              "StringEquals": "uk.gov.nationalarchives.tre.messages.Error"
             }
           ],
-          "Next": "Success"
+          "Next": "Success -> tre-internal"
+        },
+        {
+          "And": [
+            {
+              "Variable": "$.lambda-output.payload.properties.messageType",
+              "StringEquals": "uk.gov.nationalarchives.tre.messages.Error"
+            },
+            {
+              "Variable": "$.lambda-output.payload.parameters.errors",
+              "IsPresent": true
+            }
+          ],
+          "Next": "Error -> tre-internal"
         }
       ],
-      "Default": "Unhandled Event -> Slack"
+      "Default": "Unhandled Error Prep"
     },
-    "Success": {
-      "Type": "Succeed"
+    "Success -> tre-internal": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "Message.$": "$.lambda-output.payload",
+        "TopicArn": "${arn_sns_topic_packed_judgment_out}"
+      },
+      "Next": "Success -> Slack",
+      "ResultPath": null
     },
-    "Judgment Packer Unhandled Event -> Slack": {
+    "Success -> Slack": {
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
         "Message": {
           "Execution.$": "$$.Execution.Name",
           "StateMachine.$": "$$.StateMachine.Name",
-          "Status": "error",
-          "ErrorMessage.$": "$.parameters.errors",
-          "Event": "Invalid event name"
+          "Status": "success",
+          "Event": "Pack Judgment"
         },
         "TopicArn": "${arn_sns_topic_tre_slack_alerts}"
       },
-      "Next": "Judgment Packer Unhandled Event"
+      "Next": "Success"
     },
-    "Judgment Packer Unhandled Event": {
-      "Type": "Fail"
+    "Error -> tre-internal": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "Message": {
+          "properties": {
+            "messageType": "uk.gov.nationalarchives.tre.messages.Error",
+            "timestamp.$": "$$.State.EnteredTime",
+            "function": "tre-tf-module-judgment-packer",
+            "producer": "TRE",
+            "executionId.$": "$.properties.executionId",
+            "parentExecutionId.$": "$.properties.parentExecutionId"
+          },
+          "parameters": {
+            "status": "TRE_ERROR",
+            "originator.$": "$.parameters.originator",
+            "reference.$": "$.parameters.reference",
+            "errors.$": "$.lambda-output.payload.parameters.errors"
+          }
+        },
+        "TopicArn": "${arn_sns_topic_packed_judgment_out}"
+      },
+      "Next": "Error -> Slack",
+      "ResultPath": null
     },
-    "Judgment Packer Lambda Error -> Slack": {
+    "Success": {
+      "Type": "Succeed"
+    },
+    "Error -> Slack": {
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
@@ -110,31 +151,13 @@
           "Execution.$": "$$.Execution.Name",
           "StateMachine.$": "$$.StateMachine.Name",
           "Status": "error",
-          "ErrorMessage.$": "$.Cause",
-          "Event": "Lambda Error (Judgment Packer)"
+          "ErrorMessage.$": "$.lambda-output.payload.parameters.errors",
+          "Event": "Judgment Packer error"
         }
       },
       "Next": "Judgment Packer Failed"
     },
     "Judgment Packer Failed": {
-      "Type": "Fail"
-    },
-    "Unhandled Event -> Slack": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::sns:publish",
-      "Parameters": {
-        "Message": {
-          "Execution.$": "$$.Execution.Name",
-          "StateMachine.$": "$$.StateMachine.Name",
-          "Status": "error",
-          "ErrorMessage.$": "$.parameters.errors",
-          "Event": "Invalid event name"
-        },
-        "TopicArn": "${arn_sns_topic_tre_slack_alerts}"
-      },
-      "Next": "Unhandled Event"
-    },
-    "Unhandled Event": {
       "Type": "Fail"
     }
   }
