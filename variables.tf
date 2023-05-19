@@ -57,3 +57,8 @@ variable "ecr_uri_repo_prefix" {
   description = "The prefix for Docker image repository names to use; e.g. foo/ in ACCOUNT.dkr.ecr.REGION.amazonaws.com/foo/tre-bar"
   type        = string
 }
+
+variable "external_judgment_packer_out_bucket_readers" {
+  description = "The accounts that are allowed to read from the judgment packer out bucket"
+  type        = list(string)
+}

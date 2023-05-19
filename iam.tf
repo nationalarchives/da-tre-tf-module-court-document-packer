@@ -145,3 +145,18 @@ data "aws_iam_policy_document" "judgment_packer_out_bucket" {
     resources = ["${aws_s3_bucket.packed_judgment_out.arn}/*", aws_s3_bucket.packed_judgment_out.arn]
   }
 }
+
+data "aws_iam_policy_document" "judgment_packer_out_bucket" {
+  statement {
+    actions = [
+      "s3:GetObject"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers  = var.external_judgment_packer_out_bucket_readers
+    }
+
+    resources = ["${aws_s3_bucket.packed_judgment_out.arn}/*", aws_s3_bucket.packed_judgment_out.arn]
+  }
+}
