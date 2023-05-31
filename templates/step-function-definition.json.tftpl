@@ -7,7 +7,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "${arn_lambda_judgment_packer}"
+        "FunctionName": "${arn_lambda_court_document_pack}"
       },
       "Retry": [
         {
@@ -95,7 +95,7 @@
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
         "Message.$": "$.lambda-output.payload",
-        "TopicArn": "${arn_sns_topic_packed_judgment_out}"
+        "TopicArn": "${arn_sns_topic_tre_court_document_packed_out}"
       },
       "Next": "Success -> Slack",
       "ResultPath": null
@@ -122,7 +122,7 @@
           "properties": {
             "messageType": "uk.gov.nationalarchives.tre.messages.Error",
             "timestamp.$": "$$.State.EnteredTime",
-            "function": "tre-tf-module-judgment-packer",
+            "function": "tre-tf-module-court-document-pack",
             "producer": "TRE",
             "executionId.$": "$.properties.executionId",
             "parentExecutionId.$": "$.properties.parentExecutionId"
@@ -134,7 +134,7 @@
             "errors.$": "$.lambda-output.payload.parameters.errors"
           }
         },
-        "TopicArn": "${arn_sns_topic_packed_judgment_out}"
+        "TopicArn": "${arn_sns_topic_tre_court_document_packed_out}"
       },
       "Next": "Error -> Slack",
       "ResultPath": null

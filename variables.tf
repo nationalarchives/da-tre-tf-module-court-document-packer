@@ -19,16 +19,16 @@ variable "common_tre_slack_alerts_topic_arn" {
   type        = string
 }
 
-variable "judgment_packer_sf_version" {
-  description = "judgment packer version (update if Step Function flow or called Lambda function versions change)"
+variable "court_document_pack_sf_version" {
+  description = "judgment pack version (update if Step Function flow or called Lambda function versions change)"
   type        = string
 
 }
 
-variable "judgment_packer_image_versions" {
+variable "court_document_pack_image_versions" {
   description = "Latest version of Images for Lambda Functions"
   type = object({
-    tre_judgment_packer = string
+    tre_court_document_pack = string
     tre_sqs_sf_trigger  = string
   })
 }
@@ -58,7 +58,7 @@ variable "ecr_uri_repo_prefix" {
   type        = string
 }
 
-variable "external_judgment_packer_out_bucket_readers" {
-  description = "The accounts that are allowed to read from the judgment packer out bucket"
+variable "external_court_document_packed_out_bucket_readers" {
+  description = "The accounts that are allowed to read from the court document packed out bucket"
   type        = list(string)
 }
