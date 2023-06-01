@@ -129,7 +129,7 @@ data "aws_iam_policy_document" "tre_court_document_pack_in_queue" {
 
 # S3 Policy
 
-data "aws_iam_policy_document" "court_document_packed_out_bucket" {
+data "aws_iam_policy_document" "court_document_packed_out_bucket_lamda" {
   statement {
     actions = [
       "s3:PutObject",
