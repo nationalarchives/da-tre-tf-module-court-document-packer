@@ -29,7 +29,7 @@ variable "court_document_pack_image_versions" {
   description = "Latest version of Images for Lambda Functions"
   type = object({
     tre_court_document_pack = string
-    tre_sqs_sf_trigger  = string
+    tre_sqs_sf_trigger      = string
   })
 }
 
@@ -58,7 +58,7 @@ variable "ecr_uri_repo_prefix" {
   type        = string
 }
 
-variable "external_court_document_packed_out_bucket_readers" {
+variable "external_court_document_pack_out_bucket_readers" {
   description = "The accounts that are allowed to read from the court document packed out bucket"
   type        = list(string)
 }

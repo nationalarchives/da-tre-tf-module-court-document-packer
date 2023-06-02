@@ -129,7 +129,7 @@ data "aws_iam_policy_document" "tre_court_document_pack_in_queue" {
 
 # S3 Policy
 
-data "aws_iam_policy_document" "court_document_packed_out_bucket_lamda" {
+data "aws_iam_policy_document" "court_document_pack_out_bucket_lamda" {
   statement {
     actions = [
       "s3:PutObject",
@@ -142,11 +142,11 @@ data "aws_iam_policy_document" "court_document_packed_out_bucket_lamda" {
       identifiers = [aws_iam_role.court_document_pack_sf_lambda_role.arn]
     }
 
-    resources = ["${aws_s3_bucket.tre_court_document_packed_out.arn}/*", aws_s3_bucket.tre_court_document_packed_out.arn]
+    resources = ["${aws_s3_bucket.tre_court_document_pack_out.arn}/*", aws_s3_bucket.tre_court_document_pack_out.arn]
   }
 }
 
-data "aws_iam_policy_document" "court_document_packed_out_bucket" {
+data "aws_iam_policy_document" "court_document_pack_out_bucket" {
   statement {
     actions = [
       "s3:GetObject"
@@ -154,9 +154,9 @@ data "aws_iam_policy_document" "court_document_packed_out_bucket" {
 
     principals {
       type        = "AWS"
-      identifiers  = var.external_court_document_packed_out_bucket_readers
+      identifiers = var.external_court_document_pack_out_bucket_readers
     }
 
-    resources = ["${aws_s3_bucket.tre_court_document_packed_out.arn}/*", aws_s3_bucket.tre_court_document_packed_out.arn]
+    resources = ["${aws_s3_bucket.tre_court_document_pack_out.arn}/*", aws_s3_bucket.tre_court_document_pack_out.arn]
   }
 }

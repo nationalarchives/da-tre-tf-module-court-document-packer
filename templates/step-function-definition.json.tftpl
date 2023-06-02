@@ -95,7 +95,7 @@
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
         "Message.$": "$.lambda-output.payload",
-        "TopicArn": "${arn_sns_topic_tre_court_document_packed_out}"
+        "TopicArn": "${arn_sns_topic_tre_court_document_pack_out}"
       },
       "Next": "Success -> Slack",
       "ResultPath": null
@@ -134,7 +134,7 @@
             "errors.$": "$.lambda-output.payload.parameters.errors"
           }
         },
-        "TopicArn": "${arn_sns_topic_tre_court_document_packed_out}"
+        "TopicArn": "${arn_sns_topic_tre_court_document_pack_out}"
       },
       "Next": "Error -> Slack",
       "ResultPath": null
