@@ -1,5 +1,5 @@
 resource "aws_lambda_function" "court_document_pack" {
-  image_uri     = "${var.ecr_uri_host}/${var.ecr_uri_repo_prefix}${var.prefix}-court-document-pack:${var.court_document_pack_image_versions.tre_court_document_pack}"
+  image_uri     = "${var.ecr_uri_host}/${var.ecr_uri_repo_prefix}${var.prefix}-judgment-packer:${var.court_document_pack_image_versions.tre_court_document_pack}"
   package_type  = "Image"
   function_name = local.lambda_name_court_document_pack
   role          = aws_iam_role.court_document_pack_sf_lambda_role.arn
