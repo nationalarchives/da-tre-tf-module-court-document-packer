@@ -1,15 +1,10 @@
 resource "aws_s3_bucket" "tre_court_document_pack_out" {
-  bucket = "${var.env}-${var.prefix}-tre-court-document-pack-out"
+  bucket = "${var.env}-${var.prefix}-court-document-pack-out"
 }
 
 resource "aws_s3_bucket_policy" "tre_court_document_pack_out" {
   bucket = aws_s3_bucket.tre_court_document_pack_out.bucket
   policy = data.aws_iam_policy_document.court_document_pack_out_bucket.json
-}
-
-resource "aws_s3_bucket_policy" "tre_court_document_pack_out_lambda" {
-  bucket = aws_s3_bucket.tre_court_document_pack_out.bucket
-  policy = data.aws_iam_policy_document.court_document_pack_out_bucket_lamda.json
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "tre_court_document_pack_out" {

@@ -129,7 +129,7 @@ data "aws_iam_policy_document" "tre_court_document_pack_in_queue" {
 
 # S3 Policy
 
-data "aws_iam_policy_document" "court_document_pack_out_bucket_lamda" {
+data "aws_iam_policy_document" "court_document_pack_out_bucket" {
   statement {
     actions = [
       "s3:PutObject",
@@ -144,9 +144,6 @@ data "aws_iam_policy_document" "court_document_pack_out_bucket_lamda" {
 
     resources = ["${aws_s3_bucket.tre_court_document_pack_out.arn}/*", aws_s3_bucket.tre_court_document_pack_out.arn]
   }
-}
-
-data "aws_iam_policy_document" "court_document_pack_out_bucket" {
   statement {
     actions = [
       "s3:GetObject"
