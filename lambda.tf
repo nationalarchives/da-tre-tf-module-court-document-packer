@@ -7,7 +7,7 @@ resource "aws_lambda_function" "court_document_pack" {
 
   environment {
     variables = {
-      "TRE_S3_COURT_document_pack_out_BUCKET" = aws_s3_bucket.tre_court_document_pack_out.bucket
+      "TRE_S3_COURT_DOCUMENT_PACK_OUT_BUCKET" = aws_s3_bucket.tre_court_document_pack_out.bucket
       "TRE_ENVIRONMENT"                       = var.env
       "TRE_PARENT_STEP_FUNCTION"              = local.step_function_name
       "TRE_PROCESS_NAME"                      = local.lambda_name_court_document_pack
