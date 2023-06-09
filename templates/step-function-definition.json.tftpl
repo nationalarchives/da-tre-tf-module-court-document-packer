@@ -1,8 +1,8 @@
 {
   "Comment": "A description of my state machine",
-  "StartAt": "Judgment Packer",
+  "StartAt": "Court Document Packer",
   "States": {
-    "Judgment Packer": {
+    "Court Document Packer": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
@@ -34,7 +34,7 @@
         "payload.$": "$.Payload"
       },
       "ResultPath": "$.lambda-output",
-      "Next": "Judgment Packer Output Handler"
+      "Next": "Court Document Pack Output Handler"
     },
     "Unhandled Error Prep": {
       "Type": "Pass",
@@ -53,7 +53,7 @@
       "OutputPath": "$.temp",
       "Next": "Error -> tre-internal"
     },
-    "Judgment Packer Output Handler": {
+    "Court Document Pack Output Handler": {
       "Type": "Choice",
       "Choices": [
         {
@@ -69,7 +69,7 @@
           "Or": [
             {
               "Variable": "$.lambda-output.payload.properties.messageType",
-              "StringEquals": "uk.gov.nationalarchives.tre.messages.judgmentpackage.available.JudgmentPackageAvailable"
+              "StringEquals": "uk.gov.nationalarchives.tre.messages.courtdocumentpackage.available.CourtDocumentPackageAvailable"
             }
           ],
           "Next": "Success -> tre-internal"
@@ -108,7 +108,7 @@
           "Execution.$": "$$.Execution.Name",
           "StateMachine.$": "$$.StateMachine.Name",
           "Status": "success",
-          "Event": "Pack Judgment"
+          "Event": "Pack Court Document"
         },
         "TopicArn": "${arn_sns_topic_tre_slack_alerts}"
       },
@@ -152,7 +152,7 @@
           "StateMachine.$": "$$.StateMachine.Name",
           "Status": "error",
           "ErrorMessage.$": "$.lambda-output.payload.parameters.errors",
-          "Event": "Judgment Packer error"
+          "Event": "Court Document Pack error"
         }
       },
       "Next": "Failed"
