@@ -1,14 +1,14 @@
-resource "aws_iam_role" "judgement_packer" {
-  name                 = "${var.env}-${var.prefix}-judgement-packer-role"
-  assume_role_policy   = data.aws_iam_policy_document.judgment_packer_assume_role_policy.json
+resource "aws_iam_role" "court-document-pack" {
+  name                 = "${var.env}-${var.prefix}-court-document-pack-role"
+  assume_role_policy   = data.aws_iam_policy_document.court_document_pack_assume_role_policy.json
   permissions_boundary = var.tre_permission_boundary_arn
   inline_policy {
-    name   = "judgment-packer-policies"
-    policy = data.aws_iam_policy_document.judgment_packer_sf_machine_policy.json
+    name   = "court-document-pack-policies"
+    policy = data.aws_iam_policy_document.court_document_pack_sf_machine_policy.json
   }
 }
 
-data "aws_iam_policy_document" "judgment_packer_assume_role_policy" {
+data "aws_iam_policy_document" "court_document_pack_assume_role_policy" {
   statement {
     actions = ["sts:AssumeRole"]
 
@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "judgment_packer_assume_role_policy" {
   }
 }
 
-data "aws_iam_policy_document" "judgment_packer_sf_machine_policy" {
+data "aws_iam_policy_document" "court_document_pack_sf_machine_policy" {
   statement {
     actions = [
       "logs:CreateLogDelivery",
@@ -53,38 +53,38 @@ data "aws_iam_policy_document" "judgment_packer_sf_machine_policy" {
     effect  = "Allow"
     actions = ["lambda:InvokeFunction"]
     resources = [
-      aws_lambda_function.judgment_packer.arn
+      aws_lambda_function.court_document_pack.arn
     ]
   }
 }
 
 # Lambda Roles
 
-# Role for the lambda functions in judgment packer step-function
-resource "aws_iam_role" "judgment_packer_sf_lambda_role" {
-  name                 = "${var.env}-${var.prefix}-judgment-packer-sf-lambda-role"
+# Role for the lambda functions in judgment pack step-function
+resource "aws_iam_role" "court_document_pack_sf_lambda_role" {
+  name                 = "${var.env}-${var.prefix}-court-document-pack-sf-lambda-role"
   assume_role_policy   = data.aws_iam_policy_document.lambda_assume_role_policy.json
   permissions_boundary = var.tre_permission_boundary_arn
 }
 
-resource "aws_iam_role_policy_attachment" "judgment_packer_lambda_logs" {
-  role       = aws_iam_role.judgment_packer_sf_lambda_role.name
+resource "aws_iam_role_policy_attachment" "court_document_pack_lambda_logs" {
+  role       = aws_iam_role.court_document_pack_sf_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs"
 }
 
-# Role for the judgment packer step-function trigger
-resource "aws_iam_role" "judgment_packer_sf_trigger_role" {
-  name                 = "${var.env}-${var.prefix}-judgment-packer-sf-trigger-lambda-role"
+# Role for the judgment pack step-function trigger
+resource "aws_iam_role" "court_document_pack_sf_trigger_role" {
+  name                 = "${var.env}-${var.prefix}-court-document-pack-sf-trigger-lambda-role"
   assume_role_policy   = data.aws_iam_policy_document.lambda_assume_role_policy.json
   permissions_boundary = var.tre_permission_boundary_arn
   inline_policy {
-    name   = "${var.env}-${var.prefix}-judgment-packer-sf-trigger"
-    policy = data.aws_iam_policy_document.judgment_packer_sf_trigger.json
+    name   = "${var.env}-${var.prefix}-court-document-pack-sf-trigger"
+    policy = data.aws_iam_policy_document.court_document_pack_sf_trigger.json
   }
 }
 
-resource "aws_iam_role_policy_attachment" "judgment_packer_sqs_lambda_trigger" {
-  role       = aws_iam_role.judgment_packer_sf_trigger_role.name
+resource "aws_iam_role_policy_attachment" "court_document_pack_sqs_lambda_trigger" {
+  role       = aws_iam_role.court_document_pack_sf_trigger_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
@@ -101,17 +101,17 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
   }
 }
 
-data "aws_iam_policy_document" "judgment_packer_sf_trigger" {
+data "aws_iam_policy_document" "court_document_pack_sf_trigger" {
   statement {
     actions   = ["states:StartExecution"]
     effect    = "Allow"
-    resources = [aws_sfn_state_machine.judgment_packer_sf.arn]
+    resources = [aws_sfn_state_machine.court_document_pack_sf.arn]
   }
 }
 
 # SQS Polciy
 
-data "aws_iam_policy_document" "tre_judgment_packer_in_queue" {
+data "aws_iam_policy_document" "tre_court_document_pack_in_queue" {
   statement {
     actions = ["sqs:SendMessage"]
     effect  = "Allow"
@@ -122,14 +122,14 @@ data "aws_iam_policy_document" "tre_judgment_packer_in_queue" {
       ]
     }
     resources = [
-      aws_sqs_queue.judgment_packer_in_sqs.arn
+      aws_sqs_queue.court_document_pack_in_sqs.arn
     ]
   }
 }
 
 # S3 Policy
 
-data "aws_iam_policy_document" "judgment_packer_out_bucket" {
+data "aws_iam_policy_document" "court_document_pack_out_bucket" {
   statement {
     actions = [
       "s3:PutObject",
@@ -139,9 +139,21 @@ data "aws_iam_policy_document" "judgment_packer_out_bucket" {
 
     principals {
       type        = "AWS"
-      identifiers = [aws_iam_role.judgment_packer_sf_lambda_role.arn]
+      identifiers = [aws_iam_role.court_document_pack_sf_lambda_role.arn]
     }
 
-    resources = ["${aws_s3_bucket.packed_judgment_out.arn}/*", aws_s3_bucket.packed_judgment_out.arn]
+    resources = ["${aws_s3_bucket.tre_court_document_pack_out.arn}/*", aws_s3_bucket.tre_court_document_pack_out.arn]
+  }
+  statement {
+    actions = [
+      "s3:GetObject"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = var.external_court_document_pack_out_bucket_readers
+    }
+
+    resources = ["${aws_s3_bucket.tre_court_document_pack_out.arn}/*", aws_s3_bucket.tre_court_document_pack_out.arn]
   }
 }
