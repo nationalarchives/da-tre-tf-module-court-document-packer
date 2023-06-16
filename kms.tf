@@ -11,5 +11,5 @@ resource "aws_kms_key" "tre_court_document_pack_out_key" {
 # Add an alias to the key
 resource "aws_kms_alias" "tre_court_document_pack_out_key_alias" {
   name          = "alias/s3/${var.env}/${var.prefix}-tre_court_document_pack_out"
-  target_key_id = aws_kms_key.tre_court_document_pack_out_key
+  target_key_id = aws_kms_key.tre_court_document_pack_out_key.key_id
 }
