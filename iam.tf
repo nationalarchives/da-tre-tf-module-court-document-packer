@@ -183,7 +183,6 @@ data "aws_iam_policy_document" "court_document_pack_out_bucket_kms" {
       "kms:Encrypt",
       "kms:Decrypt"
     ]
-    resources = ["*"]
+    resources = [aws_kms_key.tre_court_document_pack_out_key.arn]
   }
-
 }
