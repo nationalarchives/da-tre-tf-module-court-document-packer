@@ -11,7 +11,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "tre_court_documen
   bucket = aws_s3_bucket.tre_court_document_pack_out.id
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "aws:kms"
+      kms_master_key_id = "alias/s3/${var.env}/${var.prefix}-tre_court_document_pack_out"
+      sse_algorithm     = "aws:kms"
     }
   }
 }

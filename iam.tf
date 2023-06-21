@@ -157,3 +157,32 @@ data "aws_iam_policy_document" "court_document_pack_out_bucket" {
     resources = ["${aws_s3_bucket.tre_court_document_pack_out.arn}/*", aws_s3_bucket.tre_court_document_pack_out.arn]
   }
 }
+
+data "aws_iam_policy_document" "court_document_pack_out_bucket_kms" {
+
+  statement {
+    sid     = "Allow access for Key Administrators"
+    actions = ["kms:*"]
+    effect  = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${var.account_id}:root"]
+    }
+
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "Allow court doc readers key"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = var.external_court_document_pack_out_bucket_readers
+    }
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt"
+    ]
+    resources = ["*"]
+  }
+}
