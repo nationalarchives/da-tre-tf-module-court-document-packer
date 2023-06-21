@@ -99,6 +99,14 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
       identifiers = ["lambda.amazonaws.com"]
     }
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt"
+    ]
+    resources = [aws_kms_key.tre_court_document_pack_out_key.arn]
+  }
 }
 
 data "aws_iam_policy_document" "court_document_pack_sf_trigger" {
