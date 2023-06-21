@@ -99,6 +99,9 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
       identifiers = ["lambda.amazonaws.com"]
     }
   }
+}
+
+data "aws_iam_policy_document" "packer_lambda_kms_policy_data" {
   statement {
     effect = "Allow"
     actions = [
@@ -107,6 +110,17 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
     ]
     resources = [aws_kms_key.tre_court_document_pack_out_key.arn]
   }
+}
+
+resource "aws_iam_policy" "packer_lambda_kms_policy" {
+  name        = "test-policy"
+  description = "A test policy"
+  policy      = data.aws_iam_policy_document.packer_lambda_kms_policy_data.json
+}
+
+resource "aws_iam_role_policy_attachment" "packer_lambda_key" {
+  role       = aws_iam_role.court_document_pack_sf_lambda_role.name
+  policy_arn = aws_iam_policy.packer_lambda_kms_policy.arn
 }
 
 data "aws_iam_policy_document" "court_document_pack_sf_trigger" {
@@ -173,8 +187,10 @@ data "aws_iam_policy_document" "court_document_pack_out_bucket_kms" {
     actions = ["kms:*"]
     effect  = "Allow"
     principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.account_id}:root"]
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${var.account_id}:root"
+      ]
     }
 
     resources = ["*"]
