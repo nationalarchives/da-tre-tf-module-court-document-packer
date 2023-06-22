@@ -113,8 +113,8 @@ data "aws_iam_policy_document" "packer_lambda_kms_policy_data" {
 }
 
 resource "aws_iam_policy" "packer_lambda_kms_policy" {
-  name        = "test-policy"
-  description = "A test policy"
+  name        = "${var.env}-${var.prefix}-packer-s3-key"
+  description = "The KMS key policy for packer lambda"
   policy      = data.aws_iam_policy_document.packer_lambda_kms_policy_data.json
 }
 
