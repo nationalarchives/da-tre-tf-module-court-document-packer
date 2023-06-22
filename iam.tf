@@ -187,10 +187,8 @@ data "aws_iam_policy_document" "court_document_pack_out_bucket_kms" {
     actions = ["kms:*"]
     effect  = "Allow"
     principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${var.account_id}:root"
-      ]
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${var.account_id}:root"]
     }
 
     resources = ["*"]
