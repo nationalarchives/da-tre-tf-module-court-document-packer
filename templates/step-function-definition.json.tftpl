@@ -1,7 +1,36 @@
 {
   "Comment": "A description of my state machine",
-  "StartAt": "Court Document Packer",
+  "StartAt": "Check optional output parameter",
   "States": {
+     "Check optional output parameter": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.parameters.originator",
+          "IsPresent": true,
+          "Next": "Pass optional output parameter"
+        }
+      ],
+      "Default": "Pass empty optional output parameters"
+    },
+    "Pass empty optional output parameters": {
+      "Type": "Pass",
+      "Next": "Court Document Packer",
+      "Parameters": {
+        "parameters": {}
+      },
+      "ResultPath": "$.output.optional"
+    },
+    "Pass optional output parameter": {
+      "Type": "Pass",
+      "Next": "Court Document Packer",
+      "Parameters": {
+        "parameters": {
+          "originator.$": "$.parameters.originator"
+        }
+      },
+      "ResultPath": "$.output.optional"
+    },
     "Court Document Packer": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
@@ -26,7 +55,7 @@
           "ErrorEquals": [
             "States.ALL"
           ],
-          "Next": "Error -> tre-internal",
+          "Next": "Prepare TRE Error",
           "ResultPath": "$.lambda-output.payload.parameters.errors"
         }
       ],
@@ -47,10 +76,21 @@
           }
         },
         "parameters.$": "$.parameters",
-        "properties.$": "$.properties"
+        "properties.$": "$.properties",
+        "output.$": "$.output"
       },
       "ResultPath": "$.temp",
       "OutputPath": "$.temp",
+      "Next": "Prepare TRE Error"
+    },
+    "Prepare TRE Error": {
+      "Type" :"Pass",
+      "Parameters": {
+        "status": "TRE_ERROR",
+        "reference.$": "$.parameters.reference",
+        "errors.$": "$.lambda-output.payload.parameters.errors"
+      },
+      "ResultPath": "$.output.error.parameters",
       "Next": "Error -> tre-internal"
     },
     "Court Document Pack Output Handler": {
@@ -85,7 +125,7 @@
               "IsPresent": true
             }
           ],
-          "Next": "Error -> tre-internal"
+          "Next": "Prepare TRE Error"
         }
       ],
       "Default": "Unhandled Error Prep"
@@ -127,12 +167,7 @@
             "executionId.$": "$.properties.executionId",
             "parentExecutionId.$": "$.properties.parentExecutionId"
           },
-          "parameters": {
-            "status": "TRE_ERROR",
-            "originator.$": "$.parameters.originator",
-            "reference.$": "$.parameters.reference",
-            "errors.$": "$.lambda-output.payload.parameters.errors"
-          }
+          "parameters.$": "States.JsonMerge($.output.error.parameters, $.output.optional.parameters, false)"
         },
         "TopicArn": "${arn_sns_topic_tre_court_document_pack_out}"
       },
