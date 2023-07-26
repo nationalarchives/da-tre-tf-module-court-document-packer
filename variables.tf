@@ -43,6 +43,11 @@ variable "tre_dlq_alerts_lambda_function_name" {
   type        = string
 }
 
+variable "success_handler_lambda_arn" {
+  description = "TRE Success Handler Lambda Function Name"
+  type        = string
+}
+
 variable "tre_permission_boundary_arn" {
   description = "ARN of the TRE permission boundary policy"
   type        = string

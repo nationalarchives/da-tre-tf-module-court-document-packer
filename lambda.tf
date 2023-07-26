@@ -14,6 +14,15 @@ resource "aws_lambda_function" "court_document_pack" {
       "TRE_SYSTEM_NAME"                       = upper(var.prefix)
     }
   }
+
+  destination_config {
+    on_success {
+      destination = var.success_handler_lambda_arn
+    }
+    on_failure {
+      destination = var.success_handler_lambda_arn
+    }
+  }
 }
 
 # court_document_pack_step_function_trigger

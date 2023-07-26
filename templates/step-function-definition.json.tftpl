@@ -36,7 +36,8 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
         "Payload.$": "$",
-        "FunctionName": "${arn_lambda_court_document_pack}"
+        "FunctionName": "${arn_lambda_court_document_pack}",
+        "InvocationType": "Event"
       },
       "Retry": [
         {
