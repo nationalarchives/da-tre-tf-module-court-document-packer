@@ -15,6 +15,10 @@ resource "aws_lambda_function" "court_document_pack" {
     }
   }
 
+}
+
+resource "aws_lambda_function_event_invoke_config" "packer_success_failure_destinations" {
+  function_name = local.lambda_name_court_document_pack
   destination_config {
     on_success {
       destination = var.success_handler_lambda_arn
