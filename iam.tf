@@ -105,7 +105,8 @@ data "aws_iam_policy_document" "packer_lambda_kms_policy_data" {
   statement {
     effect = "Allow"
     actions = [
-      "kms:*"
+      "kms:GenerateDataKey",
+      "kms:Decrypt"
     ]
     resources = [aws_kms_key.tre_court_document_pack_out_key.arn]
   }
