@@ -91,7 +91,7 @@
         "errors.$": "$.lambda-output.payload.parameters.errors"
       },
       "ResultPath": "$.output.error.parameters",
-      "Next": "Error -> tre-internal"
+      "Next": "Error -> da-eventbus"
     },
     "Court Document Pack Output Handler": {
       "Type": "Choice",
@@ -112,7 +112,7 @@
               "StringEquals": "uk.gov.nationalarchives.tre.messages.courtdocumentpackage.available.CourtDocumentPackageAvailable"
             }
           ],
-          "Next": "Success -> tre-internal"
+          "Next": "Success -> da-eventbus"
         },
         {
           "And": [
@@ -130,7 +130,7 @@
       ],
       "Default": "Unhandled Error Prep"
     },
-    "Success -> tre-internal": {
+    "Success -> da-eventbus": {
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
@@ -154,7 +154,7 @@
       },
       "Next": "Success"
     },
-    "Error -> tre-internal": {
+    "Error -> da-eventbus": {
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
