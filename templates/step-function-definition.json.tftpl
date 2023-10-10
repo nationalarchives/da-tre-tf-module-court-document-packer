@@ -91,7 +91,7 @@
         "errors.$": "$.lambda-output.payload.parameters.errors"
       },
       "ResultPath": "$.output.error.parameters",
-      "Next": "Error -> tre-internal"
+      "Next": "Error -> notification topic"
     },
     "Court Document Pack Output Handler": {
       "Type": "Choice",
@@ -112,7 +112,7 @@
               "StringEquals": "uk.gov.nationalarchives.tre.messages.courtdocumentpackage.available.CourtDocumentPackageAvailable"
             }
           ],
-          "Next": "Success -> tre-internal"
+          "Next": "Success -> notification topic"
         },
         {
           "And": [
@@ -130,7 +130,7 @@
       ],
       "Default": "Unhandled Error Prep"
     },
-    "Success -> tre-internal": {
+    "Success -> notification topic": {
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
@@ -154,7 +154,7 @@
       },
       "Next": "Success"
     },
-    "Error -> tre-internal": {
+    "Error -> notification topic": {
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
