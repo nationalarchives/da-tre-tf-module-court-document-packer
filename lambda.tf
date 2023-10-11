@@ -3,6 +3,7 @@ resource "aws_lambda_function" "court_document_pack" {
   package_type  = "Image"
   function_name = local.lambda_name_court_document_pack
   role          = aws_iam_role.court_document_pack_sf_lambda_role.arn
+  memory_size   = 256
   timeout       = 300
 
   environment {
