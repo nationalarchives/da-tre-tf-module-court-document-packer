@@ -160,7 +160,7 @@
       "Parameters": {
         "Message": {
           "properties": {
-            "messageType": "uk.gov.nationalarchives.tre.messages.Error",
+            "messageType": "uk.gov.nationalarchives.tre.messages.treerror.TreError",
             "timestamp.$": "$$.State.EnteredTime",
             "function": "tre-tf-module-court-document-pack",
             "producer": "TRE",
@@ -169,7 +169,7 @@
           },
           "parameters.$": "States.JsonMerge($.output.error.parameters, $.output.optional.parameters, false)"
         },
-        "TopicArn": "${arn_sns_topic_tre_court_document_pack_out}"
+        "TopicArn": "${notification_topic_arn}"
       },
       "Next": "Error -> Slack",
       "ResultPath": null
