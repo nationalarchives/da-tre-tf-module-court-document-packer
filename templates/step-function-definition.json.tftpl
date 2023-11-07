@@ -84,20 +84,11 @@
       "Next": "Prepare TRE Error"
     },
     "Prepare TRE Error": {
-      "Type": "Pass",
-      "ResultPath": "$.errorMessage",
-      "Result": {
-        "Fn::Sub": [
-          "Packing error:\\n${errors}",
-          {
-            "errors.$": "$.lambda-output.payload.parameters.errors"
-          }
-        ]
-      },
+      "Type" :"Pass",
       "Parameters": {
         "status": "TRE_ERROR",
         "reference.$": "$.parameters.reference",
-        "errors.$": "$.errorMessage"
+        "errors.$": "States.JsonToString($.lambda-output.payload.parameters.errors)"
       },
       "ResultPath": "$.output.error.parameters",
       "Next": "Error -> notification topic"
