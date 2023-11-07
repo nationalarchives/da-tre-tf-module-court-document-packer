@@ -88,7 +88,7 @@
       "Parameters": {
         "status": "TRE_ERROR",
         "reference.$": "$.parameters.reference",
-        "errors.$": "States.JsonToString($.lambda-output.payload.parameters.errors)"
+        "errors": "States.JsonToString($.lambda-output.payload.parameters.errors)"
       },
       "ResultPath": "$.output.error.parameters",
       "Next": "Error -> notification topic"
