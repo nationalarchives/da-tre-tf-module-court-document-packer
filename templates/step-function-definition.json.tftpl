@@ -137,22 +137,11 @@
         "Message.$": "$.lambda-output.payload",
         "TopicArn": "${arn_sns_topic_tre_court_document_pack_out}"
       },
-      "Next": "Success -> Slack",
+      "Next": "Success",
       "ResultPath": null
     },
-    "Success -> Slack": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::sns:publish",
-      "Parameters": {
-        "Message": {
-          "Execution.$": "$$.Execution.Name",
-          "StateMachine.$": "$$.StateMachine.Name",
-          "Status": "success",
-          "Event": "Pack Court Document"
-        },
-        "TopicArn": "${arn_sns_topic_tre_slack_alerts}"
-      },
-      "Next": "Success"
+    "Success": {
+      "Type": "Succeed"
     },
     "Error -> notification topic": {
       "Type": "Task",
@@ -171,26 +160,8 @@
         },
         "TopicArn": "${arn_sns_topic_tre_court_document_pack_out}"
       },
-      "Next": "Error -> Slack",
+      "Next": "Failed",
       "ResultPath": null
-    },
-    "Success": {
-      "Type": "Succeed"
-    },
-    "Error -> Slack": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::sns:publish",
-      "Parameters": {
-        "TopicArn": "${arn_sns_topic_tre_slack_alerts}",
-        "Message": {
-          "Execution.$": "$$.Execution.Name",
-          "StateMachine.$": "$$.StateMachine.Name",
-          "Status": "error",
-          "ErrorMessage.$": "$.lambda-output.payload.parameters.errors",
-          "Event": "Court Document Pack error"
-        }
-      },
-      "Next": "Failed"
     },
     "Failed": {
       "Type": "Fail"
