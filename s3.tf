@@ -20,7 +20,18 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "tre_court_documen
 resource "aws_s3_bucket_versioning" "tre_court_document_pack_out" {
   bucket = aws_s3_bucket.tre_court_document_pack_out.id
   versioning_configuration {
-    status = "Enabled"
+    status = var.limit_s3_data_retention ? "Suspended" : "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "tre_court_document_pack_out" {
+  bucket = aws_s3_bucket.tre_court_document_pack_out.id
+  rule {
+    id = "${aws_s3_bucket.tre_court_document_pack_out.id}-expiry"
+    expiration {
+      days = 7
+    }
+    status = var.limit_s3_data_retention ? "Enabled" : "Disabled"
   }
 }
 
