@@ -57,3 +57,8 @@ variable "external_court_document_pack_out_bucket_readers" {
   description = "The accounts that are allowed to read from the court document packed out bucket"
   type        = list(string)
 }
+
+variable "limit_s3_data_retention" {
+  description = "Whether s3 bucket data retention should be limited in this module"
+  type        = bool
+}
